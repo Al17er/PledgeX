@@ -2,12 +2,28 @@ import time
 import yaml
 import strategy
 import subprocess
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from uuid import uuid4
+from pathlib import Path
+from collections import deque
 from pysui import SuiConfig, SyncClient
 from pysui.sui.sui_txn import SyncTransaction
 from pysui.sui.sui_types import SuiAddress
 
-from pathlib import Path
 from aibot.logger import logger
+
+@dataclass
+class TransactionRecord:
+    """机器人交易记录"""
+    timestamp: datetime
+    action: str
+    symbol: str
+    quantity: float
+    price: float
+    fee: float
+    status: str
+    transaction_id: str = str(uuid4())
 
 
 class StupidSuiTradeBot:
@@ -15,11 +31,11 @@ class StupidSuiTradeBot:
     def __init__(self, config_path: str = '.config.yaml'):
         self.config = self._load_config(config_path)
 
-        settings = self.config.get('settings', None)
-        if settings:
-            self.interval = settings.get('interval_seconds', 3600)
-            self.gas_budget = settings.get('gas_budget', 100000)
-            self.max_retries = settings.get('max_retries', 3)
+        settings = self.config['settings']
+        self.interval = settings.get('interval_seconds', 3600)
+        self.gas_budget = settings.get('gas_budget', 100000)
+        self.max_retries = settings.get('max_retries', 3)
+        self.trade_records = deque(maxlen=settings.get('record_windows', 50))
 
         # 网络配置
         self.network_env = self.config['network']['environment']
@@ -73,7 +89,7 @@ class StupidSuiTradeBot:
         arguments: list,
         type_arguments: list
     ):
-        """通过 pysui 调用智能合约方法"""
+        """通过 pysui 调用智能合约"""
 
         # TODO: 是否需要重传机制？
         txer = SyncTransaction(
@@ -98,7 +114,7 @@ class StupidSuiTradeBot:
     
 
     def _call_cmd(self, cmd):
-        """运行指定命令"""
+        """通过命令行调用智能合约"""
         result = subprocess.run(
             cmd,
             shell=True,
@@ -109,18 +125,42 @@ class StupidSuiTradeBot:
             encoding='utf-8'
         )
 
-        output = result.stdout
-        logger.info(output)
+        if result.returncode != 0:
+            return {"status": "error", "message": result.stdout}
+        else:
+            return {"status": "success", "message": result.stdout} 
     
 
-    def call_add(self):
+    def call_add(self, coin):
         # TODO
         logger.info('call add')
+        self.trade_records.append(
+            TransactionRecord(
+                timestamp=datetime.now(timezone.utc),
+                action='BUY',
+                symbol=coin.split("::")[-1],
+                quantity=1,
+                price=1,
+                fee=1,
+                status="SUCCESS"
+            )
+        )
 
 
-    def call_decrease(self):
+    def call_decrease(self, coin):
         # TODO
         logger.info('call decrease')
+        self.trade_records.append(
+            TransactionRecord(
+                timestamp=datetime.now(timezone.utc),
+                action='SELL',
+                symbol=coin.split("::")[-1],
+                quantity=1,
+                price=1,
+                fee=1,
+                status="SUCCESS"
+            )
+        )
 
 
     def _execute(self):
@@ -129,7 +169,8 @@ class StupidSuiTradeBot:
         # deep
         coin='0xdeeb7a4662eec9f2f3def03fb937a663dddaa2e215b8078a284d026b7946c270::deep::DEEP'
         params = {
-            'bar': '15m'
+            'bar': '15m',
+            'trade_records': self.trade_records
         }
         signals = [strategy.analyze_market(coin, **params) for strategy in self.strategies]
         # TODO: 根据优先级排序
@@ -137,15 +178,16 @@ class StupidSuiTradeBot:
 
         if signals[0]['决策'] == '加仓':
             logger.info('执行 AI 加仓操作')
-            self.call_add()
+            self.call_add(coin)
         elif signals[0]['决策'] == '减仓':
             logger.info('执行 AI 减仓操作')
-            self.call_decrease()
+            self.call_decrease(coin)
+        logger.info(self.trade_records)
 
 
     def run(self):
         """启动无限循环"""
-        logger.info('AI 服务启动...')
+        logger.info('服务启动...')
 
         # TODO: 执行失败时如何处理？
         while True:

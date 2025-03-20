@@ -3,9 +3,6 @@ import time
 
 from abc import ABC, abstractmethod
 from typing import Any, Dict
-from dataclasses import dataclass
-from datetime import datetime
-from uuid import uuid4
 
 from aibot.logger import logger
 
@@ -62,16 +59,3 @@ class BaseStrategy(ABC):
             "决策": action,
             "理由": reason
         }
-    
-
-@dataclass
-class TransactionRecord:
-    """机器人交易记录"""
-    timestamp: datetime
-    action: str
-    symbol: str
-    quantity: float
-    price: float
-    fee: float
-    status: str
-    transaction_id: str = str(uuid4())
