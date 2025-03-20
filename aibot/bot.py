@@ -15,6 +15,12 @@ class StupidSuiTradeBot:
     def __init__(self, config_path: str = '.config.yaml'):
         self.config = self._load_config(config_path)
 
+        settings = self.config.get('settings', None)
+        if settings:
+            self.interval = settings.get('interval_seconds', 3600)
+            self.gas_budget = settings.get('gas_budget', 100000)
+            self.max_retries = settings.get('max_retries', 3)
+
         # 网络配置
         self.network_env = self.config['network']['environment']
         network_config = self.config['network'][self.network_env]
@@ -32,9 +38,6 @@ class StupidSuiTradeBot:
         
         self.contract_address = self.config['contracts'][self.network_env]
         self.data_url = self.config['data']['url']
-        self.interval = self.config['settings'].get('interval_seconds', 3600)
-        self.gas_budget = self.config['settings'].get('gas_budget', 100000)
-
 
     def _load_config(self, config_path):
         """加载 yaml 文件"""
@@ -48,12 +51,19 @@ class StupidSuiTradeBot:
     
     def _init_sui_client(self, network_config):
         """初始化 Sui 客户端"""
-        logger.info(f"{network_config}")
-        sui_config = SuiConfig.user_config(
-            rpc_url=network_config['rpc_url'],
-            prv_keys=[network_config['private_key']]
-        )
-        return SyncClient(sui_config)
+        max_retries = self.max_retries
+        for attempt in range(max_retries):
+            try:
+                sui_config = SuiConfig.user_config(
+                    rpc_url=network_config['rpc_url'],
+                    prv_keys=[network_config['private_key']]
+                )
+                client = SyncClient(sui_config)
+                return client
+            except Exception as e:
+                logger.warning(f"连接 SUI 节点失败 (尝试 {attempt+1}/{max_retries}): {str(e)}")
+                time.sleep(2 ** attempt)
+        raise ConnectionError("无法连接到 SUI 节点")
     
 
     def _call_contract_method(
@@ -64,6 +74,8 @@ class StupidSuiTradeBot:
         type_arguments: list
     ):
         """通过 pysui 调用智能合约方法"""
+
+        # TODO: 是否需要重传机制？
         txer = SyncTransaction(
             client=self.sui_client,
             initial_sender=SuiAddress(sender_address),
@@ -79,17 +91,10 @@ class StupidSuiTradeBot:
         result = txer.execute()
         
         if result.is_ok():
-            return {
-                "status": "success",
-                "data": result.result_data.to_json(indent=2) 
-                        if hasattr(result.result_data, "to_json") 
-                        else str(result.result_data)
-            }
+            logger.info(f"交易成功：{result.result_data}")
+            return {"status": "success", "data": result.result_data}
         else:
-            return {
-                "status": "error",
-                "message": result.result_string
-            }
+            return {"status": "error", "message": result.result_string}
     
 
     def _call_cmd(self, cmd):
@@ -126,7 +131,7 @@ class StupidSuiTradeBot:
         params = {
             'bar': '15m'
         }
-        signals = [strategy.analyze_market(coin, params) for strategy in self.strategies]
+        signals = [strategy.analyze_market(coin, **params) for strategy in self.strategies]
         # TODO: 根据优先级排序
         # xxx
 

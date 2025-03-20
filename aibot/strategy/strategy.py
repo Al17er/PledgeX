@@ -1,4 +1,5 @@
 import requests
+import time
 
 from abc import ABC, abstractmethod
 from typing import Any, Dict
@@ -23,6 +24,7 @@ class BaseStrategy(ABC):
 
     def get_coin_price(self, address, bar, limit):
         """获取当前价格数据"""
+        max_retries = 3
         headers = {"Content-Type": "application/json"}
         payload = {
             "chainId": 784,
@@ -31,17 +33,23 @@ class BaseStrategy(ABC):
             "limit": limit
         }
 
-        # TODO: retry
-        try:
-            resp = requests.get(self.data_url, headers=headers, params=payload)
-            resp.raise_for_status()
-            print(f'resp: {resp.json()}')
-            data = resp.json()['data'][0][1:-1]
-            logger.info(f"得到价格数据：{data}")
-            return data
-        except Exception as e:
-            logger.error(f"获取价格数据失败：{str(e)}")
-            return None
+        for attempt in range(max_retries):
+            try:
+                data_url = self.config['data']['url']
+                resp = requests.get(
+                    data_url,
+                    headers=headers,
+                    params=payload,
+                    timeout=5
+                )
+                resp.raise_for_status()
+                data = resp.json()['data'][0]
+                logger.info(f"成功获取价格数据: {data}")
+                return data
+            except Exception as e:
+                logger.warning(f"请求失败（{attempt+1}/{max_retries}次尝试）: {str(e)}")
+                time.sleep(1)
+        raise ValueError("价格数据获取失败")
 
 
     @staticmethod

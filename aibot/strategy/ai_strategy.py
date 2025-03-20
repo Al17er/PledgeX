@@ -1,5 +1,6 @@
 import requests
 import json
+import time
 
 from typing import Dict
 from strategy.strategy import BaseStrategy
@@ -24,8 +25,6 @@ class AIStrategy(BaseStrategy):
             bar=kwargs.get('bar', '15m'),
             limit=1
         )
-        if price is None:
-            return  
 
         prompt = PROMPT.format(
             open=price[1],
@@ -46,6 +45,25 @@ class AIStrategy(BaseStrategy):
             "temperature": 0.8
         }
 
+        max_retries= 3
+        for attempt in range(max_retries):
+            try:
+                resp = requests.post(
+                    self.endpoint,
+                    headers=headers,
+                    json=payload,
+                    timeout=30
+                )
+                resp.raise_for_status()
+                raw = resp.json()['choices'][0]['message']['content']
+                advice = self._safe_parse_advice(raw)
+                if advice:
+                    logger.info(f'[advice]: {advice}')
+                    return advice
+                raise ValueError("响应内容无法解析为有效JSON")
+            except Exception as e:
+                logger.warning(f"AI请求失败 ({attempt+1}/{max_retries}次尝试): {str(e)}")
+                time.sleep(1)
         try:
             resp = requests.post(self.endpoint, headers=headers, json=payload)
             resp.raise_for_status()
@@ -53,18 +71,18 @@ class AIStrategy(BaseStrategy):
         except Exception as e:
             logger.error(f"AI 请求失败：{str(e)}")
             return None
-
+        
+    def _safe_parse_advice(self, content: str) -> str:
+        """解析 AI 返回建议"""
+        content = content.strip()
         try:
-            advice = json.loads(advice)
-            logger.info(f'[advice]: {advice}')
-            return advice
+            return json.loads(content)
         except Exception as e:
             pass
 
-        try:
-            advice = json.loads(advice[7:-3])
-            logger.info(f'[advice]: {advice}')
-            return advice
-        except Exception as e:
-            logger.error(f"AI 请求解析失败：{str(e)}")
-            return None
+        if content.startswith("```json"):
+            try:
+                return json.loads(content[7:-3])
+            except Exception as e:
+                pass
+        return None
