@@ -14,6 +14,6 @@ fun init (otw: SUSDC, ctx: &mut TxContext) {
         ctx
     );
 
-    transfer::public_transfer(transfer_cap, ctx.sender());
-    transfer::public_transfer(transfer_cap, ctx.sender());
+    transfer::public_transfer(treasury_cap, ctx.sender());
+    transfer::public_transfer(coin_data, ctx.sender());
 }
