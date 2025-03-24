@@ -86,13 +86,14 @@
       border-radius: 8px;
       .content {
         padding: 0 15px 20px;
+        height: 100%;
         .content_item {
           display: flex;
-          justify-content:flex-start;
+          justify-content: center;
           align-items: center;
           margin: 10px 0;
           .content_left {
-            flex: 0 0 60%;
+            margin-right: 20px;
           }
         }
       }

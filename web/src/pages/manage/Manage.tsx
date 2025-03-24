@@ -6,24 +6,25 @@ import ManageStack from './ManageStack';//质押组件
 import ManageWithdraw from './ManageWithdraw';//提现组件
 
 
-function Index() {
+function Manage() {
   const [activeTab, setActiveTab] = useState('stack');
   const items = [
     {
       key: 'stack',
       label: 'Stack',
-      children: ManageStack(),
+      children: <ManageStack />,
     },
     {
       key: 'withdraw',
       label: 'Withdraw',
-      children: ManageWithdraw(),
+      children: <ManageWithdraw />,
     },
   ];
 
   return (
     <div className={styles.pledge}>
       <Tabs
+        centered
         activeKey={activeTab}
         onChange={(key: string) => setActiveTab(key)}
         className={styles.tabs}
@@ -33,4 +34,4 @@ function Index() {
   );
 }
 
-export default Index;
+export default Manage;

@@ -5,6 +5,9 @@ const { networkConfig, useNetworkVariable, useNetworkVariables } =
   createNetworkConfig({
     testnet: {
       url: getFullnodeUrl("testnet"),
+      variables: {
+        packageID: '0x123',
+      },
     },
     mainnet: {
       url: getFullnodeUrl("mainnet"),
