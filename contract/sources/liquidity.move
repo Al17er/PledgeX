@@ -33,7 +33,7 @@ public struct ProjectCoinPool<phantom T> has key{
     projectCoin:Balance<T>
 }
 
-public fun create_project_pool<T>(ctx:&mut TxContext){
+public entry fun create_project_pool<T>(ctx:&mut TxContext){
     let project_pool = ProjectCoinPool<T>{
         id:object::new(ctx),
         projectCoin:zero<T>()
@@ -54,13 +54,24 @@ public entry fun stack_usdc<T,X>(
     _admin_cap: &AdminCap,
     coin_usdc: Coin<T>,
     bound_pool:&mut BonusPool<X,T>,
+    swap_pool:&mut SwapPool<X,T>,
     project_coin_pool:&mut ProjectCoinPool<T>,
+    ns_price:u64,
     ctx: &mut TxContext
 ) {
         // 1. 获取用户传入的usdc代币的余额
         let user_usdc_balance = coin_usdc.value();
+        let bound_usdc = user_usdc_balance*bound_pool.swap_usdc;
+        let swap_usdc = user_usdc_balance-bound_usdc;
+
+        let mut user_balance = into_balance(coin_usdc);
+        let bound_balance = user_balance.split(bound_usdc);
+        join(&mut bound_pool.coin_usdc,bound_balance);
+
+        join(&mut swap_pool.coin_usdc,user_balance);
+        let split_ns = split(&mut swap_pool.coin_ns,swap_usdc*ns_price);
+        join(&mut bound_pool.coin_ns,split_ns);
         // 2. 将用户传入进来的usdc转移到usdc质押池中
-        coin::put(&mut bound_pool.coin_usdc, coin_usdc);
         // 3. 调用对应的项目代币的铸造权限，给用户同等数量的项目代币
         // coin::mint_and_transfer(projct_token_cap, user_usdc_balance, ctx.sender(), ctx);
         let split_coin_banance = split(&mut project_coin_pool.projectCoin,user_usdc_balance);
