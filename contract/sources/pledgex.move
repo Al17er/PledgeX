@@ -1,4 +1,4 @@
-module pledgex::pledgex;
+module suiautox::pledgex;
 
 use sui::coin;
 

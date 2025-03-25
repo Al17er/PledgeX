@@ -1,6 +1,8 @@
 module suiautox::liquidity;
 use sui::balance::{Balance, split,join, zero};
-use sui::coin::{Self, Coin};
+use sui::clock::{Self, Clock};
+use sui::event;
+use sui::coin::Coin;
 use sui::coin::{from_balance,into_balance};
 use sui::coin::join as join_coin;
 use sui::transfer::{share_object, public_transfer};
@@ -33,13 +35,12 @@ public struct ProjectCoinPool<phantom T> has key{
     projectCoin:Balance<T>
 }
 
-public fun create_project_pool<T>(ctx:&mut TxContext){
+public entry fun create_project_pool<T>(ctx:&mut TxContext){
     let project_pool = ProjectCoinPool<T>{
         id:object::new(ctx),
         projectCoin:zero<T>()
     };
     share_object(project_pool)
-
 }
 
 public entry fun add_project_coin<T>(
@@ -50,17 +51,28 @@ public entry fun add_project_coin<T>(
     join(&mut project_pool.projectCoin,project_balance);
 }
 
-public entry fun stack_usdc<T,X>(
+public entry fun stack_usdc<T,X,U>(
     _admin_cap: &AdminCap,
     coin_usdc: Coin<T>,
     bound_pool:&mut BonusPool<X,T>,
-    project_coin_pool:&mut ProjectCoinPool<T>,
+    swap_pool:&mut SwapPool<X,T>,
+    project_coin_pool:&mut ProjectCoinPool<U>,
+    ns_price:u64,
     ctx: &mut TxContext
 ) {
         // 1. 获取用户传入的usdc代币的余额
         let user_usdc_balance = coin_usdc.value();
+        let bound_usdc = user_usdc_balance*bound_pool.swap_usdc;
+        let swap_usdc = user_usdc_balance-bound_usdc;
+
+        let mut user_balance = into_balance(coin_usdc);
+        let bound_balance = user_balance.split(bound_usdc);
+        join(&mut bound_pool.coin_usdc,bound_balance);
+
+        join(&mut swap_pool.coin_usdc,user_balance);
+        let split_ns = split(&mut swap_pool.coin_ns,swap_usdc*ns_price);
+        join(&mut bound_pool.coin_ns,split_ns);
         // 2. 将用户传入进来的usdc转移到usdc质押池中
-        coin::put(&mut bound_pool.coin_usdc, coin_usdc);
         // 3. 调用对应的项目代币的铸造权限，给用户同等数量的项目代币
         // coin::mint_and_transfer(projct_token_cap, user_usdc_balance, ctx.sender(), ctx);
         let split_coin_banance = split(&mut project_coin_pool.projectCoin,user_usdc_balance);
@@ -78,19 +90,33 @@ public entry fun add_ns<X,Y>(
     swap_num:u64,
     ns_price:u64,
     swap_ns:u64,
-    swap_usdc:u64
+    swap_usdc:u64,
+    clock: &Clock
 ){
     // 从质押池中取出usdc并存入交换池
     let split_usdc = split(&mut bonux_pool.coin_usdc,swap_num);
     join(&mut swap_pool.coin_usdc,split_usdc);
 
     // 从交换池中取出ns并存入质押池
-    let split_ns = split(&mut swap_pool.coin_ns,swap_num*ns_price);
-    join(&mut bonux_pool.coin_ns,split_ns);
+    let split_ns = split(&mut swap_pool.coin_ns, swap_num*ns_price);
+    join(&mut bonux_pool.coin_ns, split_ns);
+
+    bonux_pool.swap_ns = swap_ns;
+    bonux_pool.swap_usdc = swap_usdc;
+
+    // 发布add事件
+    event::emit(AddEvent{
+        ns_price,
+        time: clock::timestamp_ms(clock)
+    })
 
 
-    bonux_pool.swap_ns=swap_ns;
-    bonux_pool.swap_usdc=swap_usdc;
+}
+
+// add 的事件结构
+public struct AddEvent has copy, drop{
+    ns_price: u64,
+    time: u64,
 }
 
 
@@ -101,7 +127,8 @@ public entry fun decrease_ns<X,Y>(
     swap_num:u64,
     ns_price:u64,
     swap_ns:u64,
-    swap_usdc:u64
+    swap_usdc:u64,
+    clock: &Clock
 ){
     let split_ns = split(&mut bonux_pool.coin_ns,swap_num);
     join(&mut swap_pool.coin_ns,split_ns);
@@ -110,6 +137,18 @@ public entry fun decrease_ns<X,Y>(
     join(&mut bonux_pool.coin_usdc,split_usdc);
     bonux_pool.swap_ns=swap_ns;
     bonux_pool.swap_usdc=swap_usdc;
+
+    // 发布的decrease的事件
+    event::emit(DecreaseEvent{
+        ns_price,
+        time: clock::timestamp_ms(clock)
+    })
+}
+
+// decrease 的事件结构
+public struct DecreaseEvent has copy, drop{
+    ns_price: u64,
+    time: u64,
 }
 
 public entry fun withdraw<X,Y>(
