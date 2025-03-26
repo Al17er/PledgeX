@@ -1,0 +1,9 @@
+export const NS_FAUCET = "0xcc33fdacad44e8a9d3803fbedb7cdc485accd81d59f9f64ff05c10e4b415262d::ns_faucet::NS_FAUCET"
+export const USDC_FAUCET = "0xf3384ab33801d07c79768d41c41a3ca19f982f81b5fa0dd27a27e9cc8daf110a::usdc_faucet::USDC_FAUCET"
+export const PLEDGEX = "0xa9593688740027d537efbeac62c447c15cb1aae7d7913a01cf7146bea9c21b4c::pledgex::PLEDGEX"
+
+export const BonusPool = "0x4003341fa10d42eb04c713905d8a75a487f65ba8eb1ef7e7d1a19009d669bd2c"
+export const SwapPool = "0x050c8f4a74cc0ea4a2422bc3fc75e12425244178583c139ee28aba77820fc6c2"
+export const ProjectCoinPool = "0xb4450913d9902fd3ad4120a218d7ee0320210e6503de02853f9d1fbf1afa2288"
+
+

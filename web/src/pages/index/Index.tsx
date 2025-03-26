@@ -1,11 +1,18 @@
 import { Button, message, Modal } from "antd";
 import styles from "./index.module.scss";
 import { useEffect, useState } from "react";
-import { IOption } from "@/type";
+import { IOption, Ivariables } from "@/type";
 import Manage from "../manage/Manage";
 import { useCurrentAccount } from "@mysten/dapp-kit";
+import { queryAddOperations, queryDecreaseOperations } from "@/constract";
+import { useNetworkVariables } from "@/networkConfig";
 function Index() {
-  const [messageApi, contextHolder] = message.useMessage();
+  const {
+    packageID,
+    moduleName,
+    queryOperationsAddEvent,
+    queryOperationsDecreaseEvent,
+  } = useNetworkVariables() as Ivariables;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isManageModalOpen, setIsManageModalOpen] = useState(false);
   const [optionArr, setOptionArr] = useState<IOption[]>([]);
@@ -23,7 +30,7 @@ function Index() {
     if (account) {
       setIsManageModalOpen(true);
     } else {
-      messageApi.error("please connect wallet!");
+      message.error("please connect wallet!");
     }
   };
 
@@ -48,11 +55,37 @@ function Index() {
   ];
   useEffect(() => {
     setOptionArr([...optionArrTmp]);
+    getAddOperations(packageID, moduleName, queryOperationsAddEvent);
+    getDecreaseOperations(packageID, moduleName, queryOperationsDecreaseEvent);
   }, []);
+  const getDecreaseOperations = async (
+    packageID: string,
+    module: string,
+    queryOperationsDecreaseEvent: string
+  ) => {
+    const result = await queryDecreaseOperations(
+      packageID,
+      module,
+      queryOperationsDecreaseEvent
+    );
+    console.log("result===", result);
+  };
+
+  const getAddOperations = async (
+    packageID: string,
+    module: string,
+    queryOperationsAddEvent: string
+  ) => {
+    const result = await queryAddOperations(
+      packageID,
+      module,
+      queryOperationsAddEvent
+    );
+    console.log("result===", result);
+  };
 
   return (
     <>
-      {contextHolder}
       <div className={styles.index}>
         <div className={styles.top}>
           <div className={styles.top_item}>

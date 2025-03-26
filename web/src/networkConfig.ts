@@ -6,7 +6,12 @@ const { networkConfig, useNetworkVariable, useNetworkVariables } =
     testnet: {
       url: getFullnodeUrl("testnet"),
       variables: {
-        packageID: '0x123',
+        packageID: '0x8401f41257b5e244516010718a5bfa59771e833f6be3a4edcbb833ea7c021001',
+        moduleName: "liquidity",
+        queryOperationsAddEvent: "AddEvent", // 查询买入操作
+        queryOperationsDecreaseEvent: "DecreaseEvent", // 查询卖出操作
+        stackUsdcFunction: "stack_usdc", // 用户存 usdc
+        withdrawFunction:"withdraw", // 用户取 usdc、ns
       },
     },
     mainnet: {

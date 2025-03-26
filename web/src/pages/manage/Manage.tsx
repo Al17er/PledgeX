@@ -29,6 +29,7 @@ function Manage() {
         onChange={(key: string) => setActiveTab(key)}
         className={styles.tabs}
         items={items}
+        destroyInactiveTabPane={true}
       />
     </div>
   );
