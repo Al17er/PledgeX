@@ -138,14 +138,7 @@ function ManageWithdraw(props: { price: number }) {
           </div>
         </div>
       </div>
-      {/* <div className={styles.card}>
-        <div className={styles.cardBody}>
-          <div className={styles.inputTextContainer}>
-            <span>1SUSDC=0.8USDC + 0.3NS</span>
-            <span>pool:100</span>
-          </div>
-        </div>
-      </div> */}
+
       <Button type="primary" className={styles.button} onClick={withdraw}>
         Submit
       </Button>
