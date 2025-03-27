@@ -52,7 +52,7 @@ function Header() {
     <>
       {contextHolder}
       <div className={styles.header}>
-        <div className={styles.logo}>SuiAutoX</div>
+        <div className={styles.logo}>PLEDGEX</div>
         {isConnect ? (
           <div className={styles.profile}>
             <span className={styles.account} title={account?.label || account?.address}>

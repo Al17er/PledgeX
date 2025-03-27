@@ -4,7 +4,10 @@ import { Button, message, InputNumber } from "antd";
 import { Transaction } from "@mysten/sui/transactions";
 import { suiClient, useNetworkVariables } from "@/networkConfig";
 import { Ivariables } from "@/type";
-import { useSignAndExecuteTransaction } from "@mysten/dapp-kit";
+import {
+  useCurrentAccount,
+  useSignAndExecuteTransaction,
+} from "@mysten/dapp-kit";
 import {
   BonusPool,
   NS_FAUCET,
@@ -13,39 +16,59 @@ import {
   SwapPool,
   USDC_FAUCET,
 } from "@/constant";
+import { queryAllCoin, queryBalance } from "@/constract";
 
-function ManageStack() {
+function ManageStack(props: { price: number }) {
+  const { price } = props;
+  const account = useCurrentAccount();
   const { mutate: signAndExecute } = useSignAndExecuteTransaction();
-  const { packageID, moduleName, stackUsdcFunction } =
+  const { NEWPackageID, moduleName, stackUsdcFunction } =
     useNetworkVariables() as Ivariables;
   const [coinValue, setCoinValue] = useState<number | null>(0);
   const inputNumberChange = (value: number | null) => {
-    setCoinValue(value)
-  }
+    setCoinValue(value);
+  };
   const stuckCoinEvent = async () => {
+    // 判断 coin balance 是否足够
+    if (!account) {
+      message.error("please connect wallet");
+      return;
+    }
+
     // 判断 coinValue
-    if(!coinValue) {
-      message.error("please input usdc")
-      return
+    if (!coinValue) {
+      message.error("please input usdc");
+      return;
+    }
+    const result = await queryBalance(account.address);
+    if (Number(result.totalBalance) < coinValue) {
+      message.error("coin is not enough");
+      return;
     }
     // 一个PTB
     const tx = new Transaction();
+    // if coin is enough, let us merge coin
+    const coins = await queryAllCoin(account.address, USDC_FAUCET);
+
+    // 初始化为第一个 Coin，然后逐步合并剩余的
+    coins.forEach((item) => {
+      if (item.coinObjectId !== coins[0].coinObjectId) {
+        tx.mergeCoins(tx.object(coins[0].coinObjectId), [
+          tx.object(item.coinObjectId),
+        ]);
+      }
+    });
     // 拆分usdc
-    const [depositCoin] = tx.splitCoins(
-      tx.object(
-        "0xe14f71bd353723eab8003587313ac9aa0c6f21dae892d2676f18bb1f97dc2469"
-      ),
-      [tx.pure.u64(coinValue * 1e8)]
-    );
+    const [depositCoin] = tx.splitCoins(tx.object(coins[0].coinObjectId), [
+      tx.pure.u64(coinValue),
+    ]);
+
     // stuck usdc
     tx.moveCall({
-      package: packageID,
+      package: NEWPackageID,
       module: moduleName,
       function: stackUsdcFunction,
       arguments: [
-        tx.object(
-          "0xaab5354ca446b0cc4d0b095952e013944440ce4e5af2c3d83610b67eec854c06"
-        ),
         depositCoin,
         // BonusPool,
         tx.object(BonusPool),
@@ -53,7 +76,7 @@ function ManageStack() {
         tx.object(SwapPool),
         // ProjectCoinPool,
         tx.object(ProjectCoinPool),
-        tx.pure.u64(1),
+        tx.pure.u64(price*10000),
       ],
       typeArguments: [USDC_FAUCET, NS_FAUCET, PLEDGEX],
     });
@@ -63,7 +86,6 @@ function ManageStack() {
       },
       {
         onSuccess: async (res) => {
-          console.log("==res", res);
           if (res.digest) {
             const result = await suiClient.waitForTransaction({
               digest: res.digest,
@@ -71,6 +93,7 @@ function ManageStack() {
             });
             if (result.effects?.status.status === "success") {
               message.success("stcuk usdc success");
+              setCoinValue(0);
             }
           }
         },
@@ -103,18 +126,18 @@ function ManageStack() {
           <div className={styles.cardBody}>
             <div className={styles.inputTextContainer}>
               <span>{coinValue}</span>
-              <span>SUSDC</span>
+              <span>PLEDGEX</span>
             </div>
           </div>
         </div>
-        <div className={styles.card}>
+        {/* <div className={styles.card}>
           <div className={styles.cardBody}>
             <div className={styles.inputTextContainer}>
               <span>1SUSDC=1USDC</span>
               <span>pool:100</span>
             </div>
           </div>
-        </div>
+        </div> */}
         <Button
           type="primary"
           className={styles.button}

@@ -1,11 +1,17 @@
 import { Button, message, Modal } from "antd";
 import styles from "./index.module.scss";
 import { useEffect, useState } from "react";
-import { IOption, Ivariables } from "@/type";
+import { IBPFields, IContent, IOption, IPPFields, Ivariables } from "@/type";
 import Manage from "../manage/Manage";
 import { useCurrentAccount } from "@mysten/dapp-kit";
-import { queryAddOperations, queryDecreaseOperations } from "@/constract";
+import {
+  queryAddOperations,
+  queryDecreaseOperations,
+  queryNSPrice,
+  queryObject,
+} from "@/constract";
 import { useNetworkVariables } from "@/networkConfig";
+import { BonusPool, ProjectCoinPool } from "@/constant";
 function Index() {
   const {
     packageID,
@@ -16,6 +22,12 @@ function Index() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isManageModalOpen, setIsManageModalOpen] = useState(false);
   const [optionArr, setOptionArr] = useState<IOption[]>([]);
+  const [proCoin, setProCoin] = useState(0);
+  const [swapUSDC, setSwapUSDC] = useState(0);
+  const [swapNS, setSwapNS] = useState(0);
+  const [coinUSDC, setCoinUSDC] = useState(0);
+  const [coinNS, setCoinNS] = useState(0);
+  const [nsPrice, setNsPrice] = useState(0);
   const [text, setText] = useState("");
   const account = useCurrentAccount();
   const showModal = (description: string) => {
@@ -23,9 +35,6 @@ function Index() {
     setIsModalOpen(true);
   };
 
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
   const showManageModal = () => {
     if (account) {
       setIsManageModalOpen(true);
@@ -34,55 +43,64 @@ function Index() {
     }
   };
 
-  const handleManageCancel = () => {
-    setIsManageModalOpen(false);
-  };
-  const optionArrTmp = [
-    {
-      id: 1,
-      time: "202503201211",
-      action: "Buy",
-      price: 0.98,
-      description: "这个操作好11111",
-    },
-    {
-      id: 2,
-      time: "202503211413",
-      action: "Sell",
-      price: 1.98,
-      description: "这个操作好2222",
-    },
-  ];
   useEffect(() => {
-    setOptionArr([...optionArrTmp]);
-    getAddOperations(packageID, moduleName, queryOperationsAddEvent);
-    getDecreaseOperations(packageID, moduleName, queryOperationsDecreaseEvent);
+    getProjectPool();
+    getBoundPool();
+    // 获取 ns 价格
+    getNSPrice();
   }, []);
-  const getDecreaseOperations = async (
-    packageID: string,
-    module: string,
-    queryOperationsDecreaseEvent: string
-  ) => {
-    const result = await queryDecreaseOperations(
-      packageID,
-      module,
-      queryOperationsDecreaseEvent
-    );
-    console.log("result===", result);
+  const getProjectPool = async () => {
+    try {
+      const res = await queryObject(ProjectCoinPool);
+      const content = res.data?.content as IContent;
+      const fields = content.fields as unknown as IPPFields;
+      setProCoin(Number(fields.projectCoin));
+    } catch (err) {
+      console.error("Fetch error:", err);
+    }
   };
-
-  const getAddOperations = async (
-    packageID: string,
-    module: string,
-    queryOperationsAddEvent: string
-  ) => {
-    const result = await queryAddOperations(
-      packageID,
-      module,
-      queryOperationsAddEvent
-    );
-    console.log("result===", result);
+  const getNSPrice = async () => {
+    try {
+      const ns_price = await queryNSPrice();
+      setNsPrice(ns_price);
+    } catch (err) {
+      console.error("Fetch error:", err);
+    }
   };
+  const getBoundPool = async () => {
+    const result = await queryObject(BonusPool);
+    const content = result.data?.content as IContent;
+    const fields = content.fields as unknown as IBPFields;
+    setSwapUSDC(Number(fields.swap_usdc));
+    setSwapNS(Number(fields.swap_ns));
+    setCoinUSDC(Number(fields.coin_usdc));
+    setCoinNS(Number(fields.coin_ns));
+  };
+  useEffect(() => {
+    // 使用 Promise.all 同时请求两个接口
+    Promise.all([
+      queryDecreaseOperations(
+        packageID,
+        moduleName,
+        queryOperationsAddEvent
+      ).then((res) => res),
+      queryAddOperations(
+        packageID,
+        moduleName,
+        queryOperationsDecreaseEvent
+      ).then((res) => res),
+    ])
+      .then(([data1, data2]) => {
+        // 合并两个数组
+        const combined = [...data1, ...data2];
+        combined.sort((a, b) => Number(b.time) - Number(a.time));
+        setOptionArr(combined);
+        console.log("optionArr===", optionArr);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  }, []);
 
   return (
     <>
@@ -90,27 +108,26 @@ function Index() {
         <div className={styles.top}>
           <div className={styles.top_item}>
             <div className={styles.top_name}>STACK VALUE</div>
-            <div className={styles.top_data}>$10000</div>
+            <div className={styles.top_data}>${1000000000000000 - proCoin}</div>
           </div>
           <div className={styles.top_item}>
             <div className={styles.top_name}>TOTAL USDC</div>
-            <div className={styles.top_data}>9999</div>
+            <div className={styles.top_data}>${coinUSDC}</div>
           </div>
           <div className={styles.top_item}>
             <div className={styles.top_name}>TOTAL NS</div>
-            <div className={styles.top_data}>299</div>
+            <div className={styles.top_data}>${coinNS}</div>
           </div>
           <div className={styles.top_item}>
             <div className={styles.top_name}>TOTAL PROFIT</div>
-            <div className={styles.top_data}>$999</div>
-          </div>
-          <div className={styles.top_item}>
-            <div className={styles.top_name}>CURRENT TVL</div>
-            <div className={styles.top_data}>$99</div>
-          </div>
-          <div className={styles.top_item}>
-            <div className={styles.top_name}>CURRENT PROFIT</div>
-            <div className={styles.top_data}>$10</div>
+            <div className={styles.top_data}>
+              {(
+                ((coinNS * nsPrice + coinUSDC - (1000000000000000 - proCoin)) /
+                  (1000000000000000 - proCoin)) *
+                100
+              ).toFixed(4)}
+              %
+            </div>
           </div>
         </div>
         <div className={styles.wrap}>
@@ -127,7 +144,9 @@ function Index() {
                 <div className={styles.table_wrap} key={item.id}>
                   <div className={styles.table_wrap_item}>{item.time}</div>
                   <div className={styles.table_wrap_item}>{item.action}</div>
-                  <div className={styles.table_wrap_item}>{item.price}</div>
+                  <div className={styles.table_wrap_item}>
+                    {item.price / 10000}
+                  </div>
                   <div className={styles.table_wrap_item}>
                     <Button
                       type="primary"
@@ -146,11 +165,15 @@ function Index() {
             <div className={styles.content}>
               <div className={styles.content_item}>
                 <div className={styles.content_left}>
-                  1SUSDC = 0.19USDC + 0.8NS
+                  {/* 1PLEDGEX=swap_usdc+swap_NS*NS价格=？USDC */}
+                  1PLEDGEX = {swapUSDC + swapNS * nsPrice} USDC (NS:{nsPrice})
                 </div>
                 <Button type="primary" size="small" onClick={showManageModal}>
                   Manage
                 </Button>
+              </div>
+              <div className={`${styles.content_item} ${styles.content_item_other}`}>
+                1 PLEDGEX=(swap_usdc+swap_ns*ns_price) USDC
               </div>
             </div>
           </div>
@@ -158,7 +181,7 @@ function Index() {
         <Modal
           title="Operation Parsing"
           open={isModalOpen}
-          onCancel={handleCancel}
+          onCancel={() => setIsModalOpen(false)}
           footer={null}
         >
           <div>{text}</div>
@@ -166,11 +189,11 @@ function Index() {
         <Modal
           title="Operation Parsing"
           open={isManageModalOpen}
-          onCancel={handleManageCancel}
+          onCancel={() => setIsManageModalOpen(false)}
           footer={null}
           width={400}
         >
-          <Manage />
+          <Manage price={nsPrice} />
         </Modal>
       </div>
     </>

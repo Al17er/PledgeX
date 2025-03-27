@@ -1,23 +1,23 @@
-import { Tabs} from 'antd';
+import { Tabs } from "antd";
 import styles from "./manage.module.scss";
-import { useState } from 'react';
+import { useState } from "react";
 
-import ManageStack from './ManageStack';//质押组件
-import ManageWithdraw from './ManageWithdraw';//提现组件
+import ManageStack from "./ManageStack"; //质押组件
+import ManageWithdraw from "./ManageWithdraw"; //提现组件
 
-
-function Manage() {
-  const [activeTab, setActiveTab] = useState('stack');
+function Manage(props: { price: number }) {
+  const { price } = props;
+  const [activeTab, setActiveTab] = useState("stack");
   const items = [
     {
-      key: 'stack',
-      label: 'Stack',
-      children: <ManageStack />,
+      key: "stack",
+      label: "Stack",
+      children: <ManageStack price={price} />,
     },
     {
-      key: 'withdraw',
-      label: 'Withdraw',
-      children: <ManageWithdraw />,
+      key: "withdraw",
+      label: "Withdraw",
+      children: <ManageWithdraw price={price} />,
     },
   ];
 

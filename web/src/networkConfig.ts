@@ -6,12 +6,14 @@ const { networkConfig, useNetworkVariable, useNetworkVariables } =
     testnet: {
       url: getFullnodeUrl("testnet"),
       variables: {
-        packageID: '0x8401f41257b5e244516010718a5bfa59771e833f6be3a4edcbb833ea7c021001',
+        packageID:
+          "0xd6aad0e565335286462ec72fe281258fab2e0d5fb341435459beda5044653409",
+        NEWPackageID: "0x8dccb2f6d3e6f20e994c87b8af3edde24aa6374269a59c9a5ba25f290e9c0552",
         moduleName: "liquidity",
         queryOperationsAddEvent: "AddEvent", // 查询买入操作
         queryOperationsDecreaseEvent: "DecreaseEvent", // 查询卖出操作
         stackUsdcFunction: "stack_usdc", // 用户存 usdc
-        withdrawFunction:"withdraw", // 用户取 usdc、ns
+        withdrawFunction: "new_withdraw", // 用户取 usdc、ns
       },
     },
     mainnet: {
@@ -20,6 +22,5 @@ const { networkConfig, useNetworkVariable, useNetworkVariables } =
   });
 
 const suiClient = new SuiClient(networkConfig.testnet);
-
 
 export { useNetworkVariable, useNetworkVariables, networkConfig, suiClient };
