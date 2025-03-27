@@ -4,6 +4,7 @@ import  { Component } from 'react';
 // import AddContent from "./createContent.tsx";
 import FaucetMintNS from "./faucetMintNS.tsx";
 import FaucetMint from "./faucetMint.tsx";
+import FaucetPledgex from "./faucetPledgex.tsx";
 import { Box } from "@radix-ui/themes";
 
 class Nav extends Component {
@@ -15,6 +16,7 @@ class Nav extends Component {
             <Box style={{ background: "black", padding: "20px" }}>
                 <FaucetMint onSuccess={console.log} />
                 <FaucetMintNS onSuccess={console.log} />
+                <FaucetPledgex onSuccess={console.log} />
             </Box>
         );
     }

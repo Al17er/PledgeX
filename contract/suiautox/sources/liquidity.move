@@ -52,7 +52,6 @@ public entry fun add_project_coin<T>(
 }
 
 public entry fun stack_usdc<T,X,U>(
-    _admin_cap: &AdminCap,
     coin_usdc: Coin<T>,
     bound_pool:&mut BonusPool<X,T>,
     swap_pool:&mut SwapPool<X,T>,
@@ -70,7 +69,7 @@ public entry fun stack_usdc<T,X,U>(
         join(&mut bound_pool.coin_usdc,bound_balance);
 
         join(&mut swap_pool.coin_usdc,user_balance);
-        let split_ns = split(&mut swap_pool.coin_ns,swap_usdc*ns_price);
+        let split_ns = split(&mut swap_pool.coin_ns,swap_usdc*10000/ns_price);
         join(&mut bound_pool.coin_ns,split_ns);
         // 2. 将用户传入进来的usdc转移到usdc质押池中
         // 3. 调用对应的项目代币的铸造权限，给用户同等数量的项目代币
@@ -98,7 +97,7 @@ public entry fun add_ns<X,Y>(
     join(&mut swap_pool.coin_usdc,split_usdc);
 
     // 从交换池中取出ns并存入质押池
-    let split_ns = split(&mut swap_pool.coin_ns, swap_num*ns_price);
+    let split_ns = split(&mut swap_pool.coin_ns, swap_num*10000/ns_price);
     join(&mut bonux_pool.coin_ns, split_ns);
 
     bonux_pool.swap_ns = swap_ns;
@@ -132,23 +131,25 @@ public entry fun decrease_ns<X,Y>(
 ){
     let split_ns = split(&mut bonux_pool.coin_ns,swap_num);
     join(&mut swap_pool.coin_ns,split_ns);
+    //从质押池中取出需要卖出数量的NS代币。
 
-    let split_usdc = split(&mut swap_pool.coin_usdc,swap_num/ns_price);
+    let split_usdc = split(&mut swap_pool.coin_usdc,swap_num*ns_price/10000);
     join(&mut bonux_pool.coin_usdc,split_usdc);
+    //从交易池中取出等价值NS的USDC
     bonux_pool.swap_ns=swap_ns;
     bonux_pool.swap_usdc=swap_usdc;
 
     // 发布的decrease的事件
     event::emit(DecreaseEvent{
-        ns_price,
-        time: clock::timestamp_ms(clock)
+        time: clock::timestamp_ms(clock),
+        ns_price
     })
 }
 
 // decrease 的事件结构
 public struct DecreaseEvent has copy, drop{
-    ns_price: u64,
     time: u64,
+    ns_price: u64,
 }
 
 public entry fun withdraw<X,Y>(
@@ -159,15 +160,49 @@ public entry fun withdraw<X,Y>(
     ctx:&mut TxContext
 ){
     let split_ns = split(&mut bonux_pool.coin_ns,swap_num*bonux_pool.swap_ns);
+    //从质押池中取出等比例NS数量
     join(&mut swap_pool.coin_ns,split_ns);
-    let split_usdc = split(&mut bonux_pool.coin_usdc,swap_num*ns_price);
+    let split_usdc = split(&mut swap_pool.coin_usdc,swap_num*bonux_pool.swap_ns*ns_price/10000);
+    //从交换池中取出等价值NS的USDC
     let usdc_swap_coin = from_balance(split_usdc,ctx);
-    let mut usdc_split_coin = from_balance(split(&mut bonux_pool.coin_usdc,swap_num*bonux_pool.swap_usdc),ctx);
-    join_coin(&mut usdc_split_coin,usdc_swap_coin);
+    //将取出的USDC转换为Coin类型
+    let usdc_coin_balance = split(&mut bonux_pool.coin_usdc,bonux_pool.swap_usdc*swap_num);
+    //从质押池中取出等比例USDC
+    let mut usdc_coin = from_balance(usdc_coin_balance,ctx);
+    join_coin(&mut usdc_coin,usdc_swap_coin);
+    //合并代币
     let address = sender(ctx);
-    transfer::public_transfer(usdc_split_coin,address);
-
+    transfer::public_transfer(usdc_coin,address);
 }
+
+public entry fun new_withdraw<X,Y,U>(
+    project_coin:Coin<U>,
+    bonux_pool: &mut BonusPool<X,Y>,
+    swap_pool:&mut SwapPool<X,Y>,
+    project_pool:&mut ProjectCoinPool<U>,
+    ns_price:u64,
+    ctx:&mut TxContext
+){
+    let swap_num=project_coin.value();
+    let priject_balance = into_balance(project_coin);
+    join(&mut project_pool.projectCoin,priject_balance);
+
+    let split_ns = split(&mut bonux_pool.coin_ns,swap_num*bonux_pool.swap_ns);
+    //从质押池中取出等比例NS数量
+    join(&mut swap_pool.coin_ns,split_ns);
+    let split_usdc = split(&mut swap_pool.coin_usdc,swap_num*bonux_pool.swap_ns*ns_price/10000);
+    //从交换池中取出等价值NS的USDC
+    let usdc_swap_coin = from_balance(split_usdc,ctx);
+    //将取出的USDC转换为Coin类型
+    let usdc_coin_balance = split(&mut bonux_pool.coin_usdc,bonux_pool.swap_usdc*swap_num);
+    //从质押池中取出等比例USDC
+    let mut usdc_coin = from_balance(usdc_coin_balance,ctx);
+    join_coin(&mut usdc_coin,usdc_swap_coin);
+    //合并代币
+    let address = sender(ctx);
+    transfer::public_transfer(usdc_coin,address);
+}
+
 
 
 public entry fun add_swap_pool<X,Y>(

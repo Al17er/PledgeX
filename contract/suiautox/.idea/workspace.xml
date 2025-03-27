@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="ALL" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="41dd9e8a-924e-425e-890e-5e0b40816e71" name="更改" comment="">
+      <change afterPath="$PROJECT_DIR$/../FAUCET/MOVE/pledgex/pledgex.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pledgex.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../FAUCET/FAUCET/src/config/networkConfig.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../FAUCET/FAUCET/src/config/networkConfig.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../FAUCET/MOVE/NS_FAUCET/NS.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../FAUCET/MOVE/NS_FAUCET/NS.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../FAUCET/MOVE/NS_FAUCET/sources/ns_faucet.move" beforeDir="false" afterPath="$PROJECT_DIR$/../FAUCET/MOVE/NS_FAUCET/sources/ns_faucet.move" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../FAUCET/MOVE/USDC_FAUCET/USDC.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../FAUCET/MOVE/USDC_FAUCET/USDC.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../FAUCET/MOVE/USDC_FAUCET/sources/usdc_faucet.move" beforeDir="false" afterPath="$PROJECT_DIR$/../FAUCET/MOVE/USDC_FAUCET/sources/usdc_faucet.move" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../contract/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../contract/.idea/MarsCodeWorkspaceAppSettings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../contract/.idea/contract.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../contract/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../contract/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../contract/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../contract/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../contract/Move.lock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../contract/Move.toml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../contract/sources/liquidity.move" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../contract/sources/pledgex.move" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="MacroExpansionManager">
+    <option name="directoryName" value="fqCDcIx4" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 1
+}</component>
+  <component name="ProjectId" id="2umxCTCJ1W0MBMtQCM4heErtpX2" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.rust.reset.selective.auto.import&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;032407&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;org.rust.cargo.project.model.impl.CargoExternalSystemProjectAware.subscribe.first.balloon&quot;: &quot;&quot;,
+    &quot;org.rust.first.attach.projects&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RunManager">
+    <configuration name="Build" type="SuiCommandConfiguration" factoryName="SuiCommand">
+      <option name="command" value="move build" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <envs />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="RustProjectSettings">
+    <option name="toolchainHomeDirectory" value="$USER_HOME$/.cargo/bin" />
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-76f8388c3a79-JavaScript-WS-243.24978.60" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="应用程序级" UseSingleDictionary="true" transferred="true" />
+  <component name="SuiMoveProjectSettingsService_1">
+    <option name="localSuiPath" value="$USER_HOME$/Library/sui/bin/sui" />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="默认任务">
+      <changelist id="41dd9e8a-924e-425e-890e-5e0b40816e71" name="更改" comment="" />
+      <created>1742867422720</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1742867422720</updated>
+      <workItem from="1742867423927" duration="2141000" />
+      <workItem from="1742976737123" duration="982000" />
+      <workItem from="1742980149942" duration="14029000" />
+      <workItem from="1743004045034" duration="2638000" />
+      <workItem from="1743044817132" duration="2037000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
