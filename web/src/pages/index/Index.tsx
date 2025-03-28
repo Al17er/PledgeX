@@ -64,6 +64,7 @@ function Index() {
       const ns_price = await queryNSPrice();
       setNsPrice(ns_price);
     } catch (err) {
+      getNSPrice()
       console.error("Fetch error:", err);
     }
   };
@@ -173,7 +174,7 @@ function Index() {
                 </Button>
               </div>
               <div className={`${styles.content_item} ${styles.content_item_other}`}>
-                1 PLEDGEX=(swap_usdc+swap_ns*ns_price) USDC
+                1 PLEDGEX = (swap_usdc+swap_ns*ns_price) USDC
               </div>
             </div>
           </div>
