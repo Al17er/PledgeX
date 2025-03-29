@@ -21,9 +21,9 @@ export const queryAddOperations = async (
     const json = {
       id: event.id.txDigest,
       time: timeFormmat(Number(parsedJson.time)),
-      action: "buy",
+      action: "sell",
       price: Number(parsedJson.ns_price),
-      description: "this is a good operation",
+      description: "Consistent with trading strategy",
     };
     addArr.push(json);
   });
@@ -48,9 +48,9 @@ export const queryDecreaseOperations = async (
     const json = {
       id: event.id.txDigest,
       time: timeFormmat(Number(parsedJson.time)),
-      action: "sell",
+      action: "buy",
       price: Number(parsedJson.ns_price),
-      description: "this is a good operation",
+      description: "Consistent with trading strategy",
     };
     decreaseArr.push(json);
   });

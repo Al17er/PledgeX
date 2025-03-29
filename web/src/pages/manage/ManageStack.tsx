@@ -35,6 +35,10 @@ function ManageStack(props: { price: number }) {
       return;
     }
 
+    const n=4;
+    const price_result = Math.floor(price*Math.pow(10,n));
+    console.log(price_result);
+
     // 判断 coinValue
     if (!coinValue) {
       message.error("please input usdc");
@@ -76,7 +80,7 @@ function ManageStack(props: { price: number }) {
         tx.object(SwapPool),
         // ProjectCoinPool,
         tx.object(ProjectCoinPool),
-        tx.pure.u64(price*10000),
+        tx.pure.u64(price_result),
       ],
       typeArguments: [USDC_FAUCET, NS_FAUCET, PLEDGEX],
     });

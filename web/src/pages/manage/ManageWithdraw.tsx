@@ -36,6 +36,9 @@ function ManageWithdraw(props: { price: number }) {
   useEffect(() => {
     getBoundPool();
   }, []);
+  const n=4;
+  const price_result = Math.floor(price*Math.pow(10,n));
+  console.log(price_result);
   const getBoundPool = async () => {
     const result = await queryObject(BonusPool);
     const content = result.data?.content as IContent;
@@ -80,7 +83,7 @@ function ManageWithdraw(props: { price: number }) {
         tx.object(BonusPool),
         tx.object(SwapPool),
         tx.object(ProjectCoinPool),
-        tx.pure.u64(price * 10000),
+        tx.pure.u64(price_result),
       ],
       typeArguments: [NS_FAUCET, USDC_FAUCET, PLEDGEX],
     });
