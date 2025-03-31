@@ -1,0 +1,43 @@
+.pledge {
+    padding: 20px;
+    display: flex;
+    flex-direction: column; /* 改变flex布局为主轴为垂直方向 */
+    align-items: center; /* 垂直排列时，此属性使子元素在交叉轴（这里是水平轴）上居中 */
+    justify-content: center; /* 如果需要在整个容器内垂直居中卡片和标题，保留此项 */
+    .card {
+        h3 {
+            margin-top: 0;
+            .cardTitle {
+                font-size: 1.5em; // 调整字体大小
+                margin: 0; // 移除默认的margin
+            }
+        }
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 16px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+        .cardBody {
+            .inputTextContainer, .textContainer {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 8px;
+              
+              input {
+                flex: 1;
+                margin-right: 8px;
+              }
+              
+              span {
+                flex: none; // 或者指定宽度
+              }
+            }
+          }
+
+    }
+}
+  
+
+  

@@ -1,0 +1,15 @@
+.header {
+  height: 80px;
+  border-bottom: 1px solid rgba(119, 126, 144, 0.35);
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  .button {
+    background: #1677ff !important;
+    color: #fff !important;
+    cursor: pointer;
+    padding: 10px 8px !important;
+    font-size: 14px !important;
+  }
+}
