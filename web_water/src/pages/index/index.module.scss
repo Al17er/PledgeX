@@ -1,0 +1,137 @@
+.index {
+  color: white;      // 显式定义文字颜色（重要！）
+  background: #000;
+  .top {
+    height: 100px;
+    margin: 15px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .top_item {
+      flex: 1;
+      height: 100%;
+      margin: 0 10px;
+      background: #181a1e;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      &:first-child {
+        margin-left: 0;
+      }
+      &:last-child {
+        margin-right: 0;
+      }
+      .top_name {
+        font-size: 20px;
+        line-height: 24px;
+        font-family: Poppins, sans-serif;
+        font-weight: 400;
+        color: rgb(13, 195, 164);
+      }
+      .top_data {
+        font-family: Poppins, sans-serif;
+        color: rgb(255, 255, 255);
+        font-size: 28px;
+        font-weight: 500;
+        line-height: 48px;
+        margin-top: 10px;
+      }
+    }
+  }
+  .wrap {
+    // index.module.scss
+    :global {
+      // 覆盖 Tabs 组件样式
+      .ant-tabs-tab {
+        color: white !important;  // Tab 标签文字颜色
+      }
+      
+      .ant-tabs-content {
+        color: white;            // Tab 内容区文字颜色
+      }
+      .ant-tabs-nav-wrap,
+      .ant-tabs-content,
+      .ant-spin-container {
+        background: inherit !important; // 继承父级背景
+      }
+    }
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    .left {
+      min-height: 400px;
+      flex: 1;
+      margin-right: 10px;
+      padding-bottom: 20px;
+      box-sizing: border-box;
+      background: #181a1e;
+      border-radius: 8px;
+      .table_title {
+        padding: 0 15px;
+        margin: 15px 0 20px;
+        height: 36px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-family: Poppins, sans-serif;
+        font-weight: 400;
+        line-height: 1.5;
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 14px;
+        .table_title_item_content {
+          flex: 4;
+          text-align: center; /* 水平居中 */
+        }
+        .table_title_item_date {
+          flex: 1;
+          text-align: center; /* 水平居中 */
+        }
+      }
+      .table_wrap {
+        padding: 0 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        .table_wrap_item_content {
+          font-size: larger;
+          flex: 4;
+          margin: 10px 0;
+        }
+        .table_wrap_item_date {
+          flex: 1;
+          margin: 10px 0;
+          text-align: center; /* 水平居中 */
+        }
+      }
+    }
+    .right {
+      min-height: 400px;
+      flex: 1;
+      margin-left: 10px;
+      box-sizing: border-box;
+      background: #181a1e;
+      border-radius: 8px;
+      .content {
+        padding: 0 15px 20px;
+        .content_item {
+          display: flex;
+          justify-content:flex-start;
+          align-items: center;
+          margin: 10px 0;
+          .content_left {
+            flex: 0 0 60%;
+          }
+        }
+      }
+    }
+    .title {
+      padding: 0 16px;
+      height: 64px;
+      line-height: 64px;
+      text-align: center;
+      border-bottom: 1px solid #3a3f4c;
+    }
+  }
+}
