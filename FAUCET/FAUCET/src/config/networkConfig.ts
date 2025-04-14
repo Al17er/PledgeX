@@ -8,10 +8,12 @@ const { networkConfig, useNetworkVariable, useNetworkVariables } =
     },
     testnet: {
       url: getFullnodeUrl("testnet"),
-        packageUSDC:"0xf3384ab33801d07c79768d41c41a3ca19f982f81b5fa0dd27a27e9cc8daf110a",
-        packageNS:"0xcc33fdacad44e8a9d3803fbedb7cdc485accd81d59f9f64ff05c10e4b415262d",
-        TreasuryCapUSDC:"0x0b45d5c4f16687ab5a76ad976aef6f4bb85f53dd7cb1ba2571d74ebe2803d17a",
-        TreasuryCapNS:"0x115f174539dde2b85b97376f4cd6a47130d474518b6ec82a51bcd543ecfa8619",
+        packageUSDC:"0x207c18d7a5f746110520facd0a3819b572880a734f496680e93ec552f4bb654f",
+        packageNS:"0x322002fd1f9be9178099bf742bd857cca2d2a62607cdbf256473068e01747ba9",
+        TreasuryCapUSDC:"0xc2b0e2e9c601df671e9638a688d2320990a46a814a96da89faf02d77f4e17ba2",
+        TreasuryCapNS:"0x4fae839988ced330eff0b21ec22089afb45ab0166825f78b7e61d6f91865af4e",
+        packagePledgeX:"0xfdd285cfad8a4578218533d50dd72fe7ccc85b05facf8114fca9b70681d44436",
+        TreasuryCapPledgex:"0x30a6d8f5a67f81d4654ef1c23c88cd315880bda442b2d23fc13aaf50edd69897"
     },
     mainnet: {
       url: getFullnodeUrl("mainnet"),

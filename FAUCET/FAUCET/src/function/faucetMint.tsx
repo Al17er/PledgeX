@@ -26,7 +26,7 @@ const FaucetMint: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
                 package: PackageUSDC,
                 module: "usdc_faucet",
                 function: "mint",
-                typeArguments: ['0xf3384ab33801d07c79768d41c41a3ca19f982f81b5fa0dd27a27e9cc8daf110a::usdc_faucet::USDC_FAUCET'],
+                typeArguments: ['0x207c18d7a5f746110520facd0a3819b572880a734f496680e93ec552f4bb654f::usdc_faucet::USDC_FAUCET'],
                 arguments: [
                     tx.object(TreasureCapUSDC),
                     tx.pure.u64(num*1e10), // 使用状态变量中的category值
